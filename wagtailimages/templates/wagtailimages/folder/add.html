@@ -1,0 +1,43 @@
+{% extends "wagtailadmin/base.html" %}
+{% load wagtailimages_tags i18n staticfiles %}
+{% block titletag %}{% trans "Add folder" %}{% endblock %}
+{% block extra_css %}
+    {{ block.super }}
+
+    <link rel="stylesheet" href="{% static 'wagtailimages/css/add-multiple.css' %}" type="text/css" />
+{% endblock %}
+
+{% block content %}
+    {% trans "Add folder" as add_str %}
+    {% include "wagtailadmin/shared/header.html" with title=add_str icon="folder" %}
+
+    <div class="nice-padding">
+        {% if parent_folder %} <h2>Add a folder to "{{ parent_folder.title }}"</h2> {% endif %}
+
+        {% if parent_folder %}
+            <form action="{% url 'wagtailimages:add_folder_to_folder' parent_folder.id %}" method="POST" enctype="multipart/form-data">
+        {% else %}
+            <form action="{% url 'wagtailimages:add_folder' %}" method="POST" enctype="multipart/form-data">
+        {% endif %}
+            <ul class="fields">
+                {% csrf_token %}
+                {% for field in form %}
+                    {% if field.is_hidden %}
+                        {{ field }}
+                    {% else %}
+                        {% include "wagtailadmin/shared/field_as_li.html" %}
+                    {% endif %}
+                {% endfor %}
+                <li>
+                    {% if parent_folder %}
+                        <a href="{% url 'wagtailimages:index' %}?folder={{ parent_folder.id }}" class="button button-secondary no">Cancel</a>
+                    {% else %}
+                        <a href="{% url 'wagtailimages:index' %}" class="button button-secondary no">Cancel</a>
+                    {% endif %}
+                    <input type="submit" value="{% trans 'Add' %}" />
+                </li>
+            </ul>
+        </form>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "wagtailadmin/base.html" %}
+{% load wagtailimages_tags %}
+{% load i18n %}
+{% block titletag %}{% trans "Delete folder" %}{% endblock %}
+
+{% block content %}
+    {% trans "Delete folder" as del_str %}
+    {% include "wagtailadmin/shared/header.html" with title=del_str icon="folder" %}
+
+    <div class="row row-flush nice-padding">
+        <h2><i class="icon icon-folder-inverse"></i> {{ folder.title }}</h2>
+        <div class="col12">
+            {% if not error %}
+                <p>{% trans "Are you sure you want to delete this folder?" %}</p>
+                <form action="{% url 'wagtailimages:delete_folder' folder.id %}" method="POST">
+                    {% csrf_token %}
+                    <input type="submit" value="{% trans 'Yes, delete' %}" class="serious" />
+                </form>
+            {% else %}
+                <div class="help-block help-critical">
+                    {{ error_text }}
+                </div> 
+                <p><a href="{% url 'wagtailimages:index' %}?folder={{ folder.id }}" class="button">Back</a></p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,27 @@
+        {% if not current_folder %}
+            <h2>Folders</h2>
+            {# No folder so we use folders in the root #}
+            <div id="folder-results">
+                <ul class="listing listing-folders folders">
+                    {% for folder in folders %}
+                        <li class="icon icon-larger icon-folder-inverse"><a data-folder-title="{{ folder.title }}" data-folder="{{ folder.id }}" class="folder" href="{% url 'wagtailimages:index' %}?folder={{ folder.id }}">{{ folder.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <h2>{{ current_folder.title }}</h2>
+            {# We are in a folder so only show folders sub to this #}
+            <div id="folder-results">
+                <ul class="listing listing-folders folders">
+                    {% if current_folder.get_parent %}
+                        <li class="icon icon-larger icon-arrow-up-big"><a data-folder-title="{{ folder.title }}" data-folder="{{ folder.id }}" class="folder" href="{% url 'wagtailimages:index' %}?folder={{ current_folder.get_parent.id }}">{{ current_folder.get_parent.title }}</a></li>
+                    {% else %}
+                        <li class="icon icon-larger icon-home"><a data-folder-title="{{ folder.title }}" data-folder="{{ folder.id }}" class="folder" href="{% url 'wagtailimages:index' %}">Root folder</a></li>
+                    {% endif %}
+                    {% for folder in current_folder.get_subfolders %}
+                        <li class="icon icon-larger icon-folder-inverse"><a data-folder-title="{{ folder.title }}" data-folder="{{ folder.id }}" class="folder" href="?folder={{ folder.id }}">{{ folder.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
