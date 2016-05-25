@@ -1,6 +1,23 @@
-# Wagtail-Image-Folders
+# Wagtail Image Folders
 
-Add folder support to Wagtail images. Folders can contain subfolders. Folders can be edited and deleted. Folders can only be deleted if they contain no images or other folders.
+A replacement of the standard wagtailimages app that adds folder support for organising, uploading and browsing images. Collections and tags still work.
+
+## Features
+
+ - Add folder support to Wagtail images
+ - Folders can contain subfolders
+ - Folders can be edited and deleted
+ - Folders can only be deleted if they contain no images or other folders
+
+## Compatibility
+
+Tested on version 1.4.5 of Wagtail
+
+## How to install
+
+1. Copy or clone wagtailimages into your project or replace the wagtailimages folder in wagtail with this one
+2. If you put wagtailimages in your project then replace 'wagtail.wagtailimages' in settings installed apps to just 'wagtailimages'
+3. run python manage.py migrate wagtailimages
 
 ![alt tag](https://raw.githubusercontent.com/anteatersa/Wagtail-Image-Folders/master/screenshots/img-01.png)
 ![alt tag](https://raw.githubusercontent.com/anteatersa/Wagtail-Image-Folders/master/screenshots/img-02.png)
