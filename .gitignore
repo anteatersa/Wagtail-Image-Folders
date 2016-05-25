@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-static
-=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -63,4 +60,3 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
->>>>>>> edeb013192955e39db7fcb69c26de66735476f2c
