@@ -82,7 +82,7 @@ def add(request):
             image.uploaded_by_user = request.user
             image.file_size = image.file.size
             if current_folder:
-                print "==== we have a current folder - add image to it ===="
+                # If we have a current folder - add image to it
                 image.folder = current_folder
             image.save()
 

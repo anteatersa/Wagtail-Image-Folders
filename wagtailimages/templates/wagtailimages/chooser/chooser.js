@@ -52,8 +52,7 @@ function(modal) {
             success: function(data, status) {
                 $('#image-results').html(data);
                 ajaxifyLinks($('#image-results'));
-				// Switch to folders tab
-				$('.modal a[href="#folders"]').tab('show');
+				$('.modal a[href="#folders"]').tab('show'); // Switch to folders tab
             },
 			error: function(){
 				alert('Something went wrong');
@@ -114,7 +113,6 @@ function(modal) {
     }
 
     function setSearchPage(page) {
-		alert("Page in search");
         params = {p: page};
         if ($('#id_q').val().length){
             params['q'] = $('#id_q').val();
@@ -182,9 +180,9 @@ function(modal) {
     $('form.image-search', modal.body).submit(search);
 
     $('#id_q').on('input', function() {
-        //clearTimeout($.data(this, 'timer'));
-        //var wait = setTimeout(search, 200);
-        //$(this).data('timer', wait);
+        clearTimeout($.data(this, 'timer'));
+        var wait = setTimeout(search, 200);
+        $(this).data('timer', wait);
     });
     $('#collection_chooser_collection_id').change(search);
     $('a.suggested-tag').click(function() {
