@@ -16,8 +16,7 @@ Tested on version 1.4.5 of Wagtail
 ## How to install
 
 1. Copy or clone wagtailimages into your project or replace the wagtailimages folder in wagtail with this one
-2. If you put wagtailimages in your project then replace 'wagtail.wagtailimages' in settings installed apps to just 'wagtailimages'
-3. run python manage.py migrate wagtailimages
+2. run python manage.py migrate wagtailimages
 
 ![alt tag](https://raw.githubusercontent.com/anteatersa/Wagtail-Image-Folders/master/screenshots/img-01.png)
 ![alt tag](https://raw.githubusercontent.com/anteatersa/Wagtail-Image-Folders/master/screenshots/img-02.png)
