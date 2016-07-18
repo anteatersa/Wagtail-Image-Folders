@@ -11,25 +11,31 @@ function(modal) {
 	var currentFolder;
 	var currentFolderTitle;
 
-    function ajaxifyLinks (context) {
+    function ajaxifyLinks (context, search = false) {
         $('.listing-images a', context).click(function() {
             modal.loadUrl(this.href);
             return false;
         });
 
-		// Main Pagination
-        $('#image-results .pagination a').click(function() {
-            var page = this.getAttribute("data-page");
-            setPage(page);
-            return false;
-        });
+        if (!search) {
+            //alert('ajaxify main pagination');
+            // Main Pagination
+            $('#image-results .pagination a').click(function() {
+                var page = this.getAttribute("data-page");
+                setPage(page);
+                return false;
+            });
+        }
 
-		// Search Pagination
-        $('#image-search-results .pagination a').click(function() {
-            var page = this.getAttribute("data-page");
-            setSearchPage(page);
-            return false;
-        });
+        if (search) {
+            //alert('ajaxify search pagination');
+            // Search Pagination
+            $('#image-search-results .pagination a').click(function() {
+                var page = this.getAttribute("data-page");
+                setSearchPage(page);
+                return false;
+            });
+        }
 
         $('.listing-folders a', context).click(function() {
             var folder = this.getAttribute("data-folder");
@@ -66,7 +72,7 @@ function(modal) {
             data: requestData,
             success: function(data, status) {
                 $('#image-search-results').html(data);
-                ajaxifyLinks($('#image-search-results'));
+                ajaxifyLinks($('#image-search-results'), search = true);
             },
 			error: function(){
 				alert('Something went wrong');
@@ -101,11 +107,16 @@ function(modal) {
 
     function setPage(page) {
         params = {p: page};
-        if ($('#id_q').val().length){
-            params['q'] = $('#id_q').val();
-        }
+        //if ($('#id_q').val().length){
+        //    params['q'] = $('#id_q').val();
+        //}
         if (currentTag) {
             params['tag'] = currentTag;
+        }
+        if ( currentFolder ){
+            params['folder'] = currentFolder;
+        } else {
+            params['folder'] = '';
         }
         params['collection_id'] = $('#collection_chooser_collection_id').val();
         fetchResults(params);
@@ -154,25 +165,26 @@ function(modal) {
     $('form.image-upload', modal.body).submit(function() {
         var formdata = new FormData(this);
 
-        $.ajax({
-            url: this.action,
-            data: formdata,
-            processData: false,
-            contentType: false,
-            type: 'POST',
-            dataType: 'text',
-            success: function(response){
-                modal.loadResponseText(response);
-            },
-            error: function(response, textStatus, errorThrown) {
-                {% trans "Server Error" as error_label %}
-                {% trans "Report this error to your webmaster with the following information:" as error_message %}
-                message = '{{ error_message|escapejs }}<br />' + errorThrown + ' - ' + response.status;
-                $('#upload').append(
-                    '<div class="help-block help-critical">' +
-                    '<strong>{{ error_label|escapejs }}: </strong>' + message + '</div>');
+        if ($('#id_title', modal.body).val() == '') {
+            var li = $('#id_title', modal.body).closest('li');
+            if (!li.hasClass('error')) {
+                li.addClass('error');
+                $('#id_title', modal.body).closest('.field-content').append('<p class="error-message"><span>This field is required.</span></p>')
             }
-        });
+            setTimeout(cancelSpinner, 500);
+        } else {
+            $.ajax({
+                url: this.action,
+                data: formdata,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                dataType: 'text',
+                success: function(response){
+                    modal.loadResponseText(response);
+                }
+            });
+        }
 
         return false;
     });

@@ -23,7 +23,7 @@
                 <form action="{% url 'wagtailimages:add_multiple' %}" method="POST" enctype="multipart/form-data">
             {% endif %}
                 <div class="replace-file-input">
-                    <button class="bicolor icon icon-plus">{% trans "Or choose from your computer" %}</button>
+                    <button class="button bicolor icon icon-plus">{% trans "Or choose from your computer" %}</button>
                     {% if current_folder %}
                     <input id="fileupload" type="file" name="files[]" data-url="{% url 'wagtailimages:add_multiple' %}?folder={{ current_folder.id }}" multiple>
                     {% else %}

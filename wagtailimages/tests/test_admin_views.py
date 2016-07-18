@@ -1,14 +1,20 @@
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import json
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse
+from django.template.defaultfilters import filesizeformat
 from django.test import TestCase, override_settings
 from django.utils.http import urlquote
-from django.core.urlresolvers import reverse
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Permission, Group
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.template.defaultfilters import filesizeformat
+
+from wagtail.tests.utils import WagtailTestUtils
+from wagtail.wagtailcore.models import Collection, GroupCollectionPermission
+from wagtail.wagtailimages.views.serve import generate_signature
+
+from .utils import Image, get_test_image_file
 
 # Get the chars that Django considers safe to leave unescaped in a URL
 # This list changed in Django 1.8:  https://github.com/django/django/commit/e167e96cfea670422ca75d0b35fe7c4195f25b63
@@ -17,12 +23,6 @@ try:
     urlquote_safechars = RFC3986_SUBDELIMS + str('/~:@')
 except ImportError:  # < Django 1,8
     urlquote_safechars = '/'
-
-from wagtail.tests.utils import WagtailTestUtils
-from wagtail.wagtailcore.models import Collection, GroupCollectionPermission
-from wagtail.wagtailimages.utils import generate_signature
-
-from .utils import Image, get_test_image_file
 
 
 class TestImageIndexView(TestCase, WagtailTestUtils):
@@ -74,6 +74,9 @@ class TestImageAddView(TestCase, WagtailTestUtils):
         # as standard, only the root collection exists and so no 'Collection' option
         # is displayed on the form
         self.assertNotContains(response, '<label for="id_collection">')
+
+        # Ensure the form supports file uploads
+        self.assertContains(response, 'enctype="multipart/form-data"')
 
     def test_get_with_collections(self):
         root_collection = Collection.get_first_root_node()
@@ -264,6 +267,9 @@ class TestImageEditView(TestCase, WagtailTestUtils):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'wagtailimages/images/edit.html')
 
+        # Ensure the form supports file uploads
+        self.assertContains(response, 'enctype="multipart/form-data"')
+
     @override_settings(WAGTAIL_USAGE_COUNT_ENABLED=True)
     def test_with_usage_count(self):
         response = self.get()
@@ -367,9 +373,7 @@ class TestImageDeleteView(TestCase, WagtailTestUtils):
         self.assertTemplateUsed(response, 'wagtailimages/images/confirm_delete.html')
 
     def test_delete(self):
-        response = self.post({
-            'hello': 'world'
-        })
+        response = self.post()
 
         # Should redirect back to index
         self.assertRedirects(response, reverse('wagtailimages:index'))
@@ -485,6 +489,24 @@ class TestImageChooserUploadView(TestCase, WagtailTestUtils):
 
         # The form should have an error
         self.assertFormError(response, 'uploadform', 'file', "This field is required.")
+
+    def test_pagination_after_upload_form_error(self):
+        for i in range(0, 20):
+            Image.objects.create(
+                title="Test image %d" % i,
+                file=get_test_image_file(),
+            )
+
+        response = self.client.post(reverse('wagtailimages:chooser_upload'), {
+            'title': "Test image",
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'wagtailimages/chooser/chooser.html')
+
+        # The re-rendered image chooser listing should be paginated
+        self.assertContains(response, "Page 1 of ")
+        self.assertEqual(12, len(response.context['images']))
 
     @override_settings(DEFAULT_FILE_STORAGE='wagtail.tests.dummy_external_storage.DummyExternalStorage')
     def test_upload_with_external_storage(self):

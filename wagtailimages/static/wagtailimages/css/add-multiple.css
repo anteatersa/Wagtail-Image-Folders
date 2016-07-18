@@ -125,3 +125,15 @@
 .upload-list .upload-failure .status-msg.failure {
   display: block;
 }
+
+.upload-list .upload-server-error {
+  border-color: #cd3238;
+}
+
+.upload-list .upload-server-error .preview {
+  display: none;
+}
+
+.upload-list .upload-server-error .status-msg.server-error {
+  display: block;
+}

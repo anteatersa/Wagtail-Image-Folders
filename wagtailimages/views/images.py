@@ -1,24 +1,24 @@
+from __future__ import absolute_import, unicode_literals
+
 import os
 
-from django.shortcuts import render, redirect, get_object_or_404
+from django.core.urlresolvers import NoReverseMatch, reverse
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import ugettext as _
 from django.views.decorators.vary import vary_on_headers
-from django.core.urlresolvers import reverse, NoReverseMatch
-from django.http import HttpResponse, JsonResponse
 
 from wagtail.utils.pagination import paginate
-from wagtail.wagtailcore.models import Site, Collection
-from wagtail.wagtailadmin.forms import SearchForm
 from wagtail.wagtailadmin import messages
+from wagtail.wagtailadmin.forms import SearchForm
 from wagtail.wagtailadmin.utils import PermissionPolicyChecker, permission_denied
-from wagtail.wagtailsearch.backends import get_search_backends
-
-from wagtail.wagtailimages.models import get_image_model, get_folder_model, Filter
-from wagtail.wagtailimages.forms import get_image_form, URLGeneratorForm
-from wagtail.wagtailimages.permissions import permission_policy
-from wagtail.wagtailimages.utils import generate_signature
+from wagtail.wagtailcore.models import Collection, Site
 from wagtail.wagtailimages.exceptions import InvalidFilterSpecError
-
+from wagtail.wagtailimages.forms import URLGeneratorForm, get_image_form
+from wagtail.wagtailimages.models import get_image_model, get_folder_model, Filter
+from wagtail.wagtailimages.permissions import permission_policy
+from wagtail.wagtailimages.views.serve import generate_signature
+from wagtail.wagtailsearch import index as search_index
 
 permission_checker = PermissionPolicyChecker(permission_policy)
 
@@ -69,7 +69,6 @@ def index(request):
         except (ValueError, ImageFolder.DoesNotExist):
             print "error getting folder"
             pass
-
     paginator, images = paginate(request, images)
 
     collections = permission_policy.collections_user_has_any_permission_for(
@@ -113,7 +112,7 @@ def edit(request, image_id):
     if not permission_policy.user_has_permission_for_instance(request.user, 'change', image):
         return permission_denied(request)
 
-    if request.POST:
+    if request.method == 'POST':
         original_file = image.file
         form = ImageForm(request.POST, request.FILES, instance=image, user=request.user)
         if form.is_valid():
@@ -130,8 +129,7 @@ def edit(request, image_id):
             form.save()
 
             # Reindex the image to make sure all tags are indexed
-            for backend in get_search_backends():
-                backend.add(image)
+            search_index.insert_or_update_object(image)
 
             messages.success(request, _("Image '{0}' updated.").format(image.title), buttons=[
                 messages.button(reverse('wagtailimages:edit', args=(image.id,)), _('Edit again'))
@@ -251,7 +249,7 @@ def delete(request, image_id):
     else:
 	parent_folder = False
 
-    if request.POST:
+    if request.method == 'POST':
         image.delete()
         messages.success(request, _("Image '{0}' deleted.").format(image.title))
 
@@ -259,7 +257,6 @@ def delete(request, image_id):
 	if parent_folder:
 	    response['Location'] += '?folder={0}'.format(parent_folder.id)
 	return response
-	
 
     return render(request, "wagtailimages/images/confirm_delete.html", {
         'image': image,
@@ -271,7 +268,7 @@ def add(request):
     ImageModel = get_image_model()
     ImageForm = get_image_form(ImageModel)
 
-    if request.POST:
+    if request.method == 'POST':
         image = ImageModel(uploaded_by_user=request.user)
         form = ImageForm(request.POST, request.FILES, instance=image, user=request.user)
         if form.is_valid():
@@ -281,8 +278,7 @@ def add(request):
             form.save()
 
             # Reindex the image to make sure all tags are indexed
-            for backend in get_search_backends():
-                backend.add(image)
+            search_index.insert_or_update_object(image)
 
             messages.success(request, _("Image '{0}' added.").format(image.title), buttons=[
                 messages.button(reverse('wagtailimages:edit', args=(image.id,)), _('Edit'))

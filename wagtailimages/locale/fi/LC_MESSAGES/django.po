@@ -5,14 +5,15 @@
 # Translators:
 # Aarni Koskela, 2016
 # Eetu Häivälä <eetu.haivala@anders.fi>, 2016
+# Juha Yrjölä <juha.yrjola@iki.fi>, 2016
 # Rauli Laine <rauli.laine@iki.fi>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-11 13:57+0100\n"
-"PO-Revision-Date: 2016-04-11 13:00+0000\n"
-"Last-Translator: Karl Hobley <karl@torchbox.com>\n"
+"POT-Creation-Date: 2016-05-18 21:37+0000\n"
+"PO-Revision-Date: 2016-05-12 05:12+0000\n"
+"Last-Translator: Juha Yrjölä <juha.yrjola@iki.fi>\n"
 "Language-Team: Finnish (http://www.transifex.com/torchbox/wagtail/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -130,6 +131,12 @@ msgstr "Suositut asiasanat"
 msgid "Uploading..."
 msgstr "Lähetetään..."
 
+msgid "Server Error"
+msgstr "Palvelinvirhe"
+
+msgid "Report this error to your webmaster with the following information:"
+msgstr "Raportoi tämä virhe sivuston ylläpitäjälle seuraavan tiedon kanssa:"
+
 #, python-format
 msgid ""
 "\n"
@@ -231,6 +238,22 @@ msgstr "Kuvat"
 msgid "Sorry, no images match \"<em>%(query_string)s</em>\""
 msgstr ""
 "Pahoittelut, yksikään kuva ei täsmää hakuun \"<em>%(query_string)s</em>\""
+
+#, python-format
+msgid ""
+"You haven't uploaded any images in this collection. Why not <a href="
+"\"%(wagtailimages_add_image_url)s\">upload one now</a>?"
+msgstr ""
+"Et ole lähettänyt yhtään kuvaa tähän kokoelmaan. Mikset vaikka <a href="
+"\"%(wagtailimages_add_image_url)s\">lähettäisi yhtä nyt</a>?"
+
+#, python-format
+msgid ""
+"You haven't uploaded any images. Why not <a href="
+"\"%(wagtailimages_add_image_url)s\">upload one now</a>?"
+msgstr ""
+"Et ole lähettänyt yhtään kuvaa. Mikset vaikka <a href="
+"\"%(wagtailimages_add_image_url)s\">lähettäisi yhtä nyt</a>?"
 
 msgid "Generating URL"
 msgstr "Generoidaan osoitetta"

@@ -1,20 +1,20 @@
+from __future__ import absolute_import, unicode_literals
+
 import json
 
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render
 
 from wagtail.utils.pagination import paginate
-from wagtail.wagtailadmin.modal_workflow import render_modal_workflow
 from wagtail.wagtailadmin.forms import SearchForm
+from wagtail.wagtailadmin.modal_workflow import render_modal_workflow
 from wagtail.wagtailadmin.utils import PermissionPolicyChecker
 from wagtail.wagtailcore.models import Collection
-from wagtail.wagtailsearch.backends import get_search_backends
-
-from wagtail.wagtailimages.models import get_image_model, get_folder_model
-from wagtail.wagtailimages.forms import get_image_form, get_folder_form, ImageInsertionForm
 from wagtail.wagtailimages.formats import get_image_format
+from wagtail.wagtailimages.forms import ImageInsertionForm, get_image_form, get_folder_form
+from wagtail.wagtailimages.models import get_image_model, get_folder_model
 from wagtail.wagtailimages.permissions import permission_policy
-
+from wagtail.wagtailsearch import index as search_index
 
 permission_checker = PermissionPolicyChecker(permission_policy)
 
@@ -49,7 +49,11 @@ def chooser(request):
     else:
         uploadform = None
 
-    images = Image.objects.filter(folder__isnull = True).order_by('-created_at')
+    #images = Image.objects.filter(folder__isnull = True).order_by('-created_at')
+    # Get images (filtered by user permission)
+    images = permission_policy.instances_user_has_any_permission_for(
+        request.user, ['change', 'delete']
+    ).order_by('-created_at')
 
     # Check if folders_only
     folders_only = request.GET.get('folders_only')
@@ -76,24 +80,22 @@ def chooser(request):
         'folder' in request.GET
     ):
         # this request is triggered from search, pagination or 'popular tags';
-        # or we are searching by folder
         # we will just render the results.html fragment
         collection_id = request.GET.get('collection_id')
         if collection_id:
-            images = Image.objects.filter(collection=collection_id)
+            images = images.filter(collection=collection_id)
 
         searchform = SearchForm(request.GET)
         if searchform.is_valid():
             q = searchform.cleaned_data['q']
-
-            images = Image.objects.search(q)
+            images = images.search(q)
             is_searching = True
         else:
             is_searching = False
 
             tag_name = request.GET.get('tag')
             if tag_name:
-                images = Image.objects.filter(tags__name=tag_name)
+                images = images.filter(tags__name=tag_name)
 
         # Pagination
         paginator, images = paginate(request, images, per_page=12)
@@ -155,7 +157,7 @@ def chooser_upload(request):
 
     searchform = SearchForm()
 
-    if request.POST:
+    if request.method == 'POST':
         image = Image(uploaded_by_user=request.user)
         form = ImageForm(request.POST, request.FILES, instance=image, user=request.user)
 
@@ -163,8 +165,7 @@ def chooser_upload(request):
             form.save()
 
             # Reindex the image to make sure all tags are indexed
-            for backend in get_search_backends():
-                backend.add(image)
+            search_index.insert_or_update_object(image)
 
             if request.GET.get('select_format'):
                 form = ImageInsertionForm(initial={'alt_text': image.default_alt_text})
@@ -181,7 +182,8 @@ def chooser_upload(request):
     else:
         form = ImageForm(user=request.user)
 
-    images = Image.objects.order_by('title')
+    images = Image.objects.order_by('-created_at')
+    paginator, images = paginate(request, images, per_page=12)
 
     return render_modal_workflow(
         request, 'wagtailimages/chooser/chooser.html', 'wagtailimages/chooser/chooser.js',
@@ -192,7 +194,7 @@ def chooser_upload(request):
 def chooser_select_format(request, image_id):
     image = get_object_or_404(get_image_model(), id=image_id)
 
-    if request.POST:
+    if request.method == 'POST':
         form = ImageInsertionForm(request.POST, initial={'alt_text': image.default_alt_text})
         if form.is_valid():
 

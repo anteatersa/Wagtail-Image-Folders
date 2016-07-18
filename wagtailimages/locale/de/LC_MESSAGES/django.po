@@ -7,6 +7,7 @@
 # Johannes Spielmann <j@spielmannsolutions.com>, 2014-2015
 # M0rph 3u5 <transifex@m0rph3u5.net>, 2014
 # Max Pfeiffer <max.pfeiffer@alp-phone.ch>, 2015
+# Moritz Pfeiffer <moritz@alp-phone.ch>, 2016
 # pcraston <patrick@craston.com>, 2014
 # pcraston <patrick@craston.com>, 2014
 # Tammo van Lessen <tvanlessen@gmail.com>, 2015
@@ -15,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-11 13:57+0100\n"
-"PO-Revision-Date: 2016-04-13 08:33+0000\n"
-"Last-Translator: Henrik Kröger <hedwig@riseup.net>\n"
+"POT-Creation-Date: 2016-05-18 21:37+0000\n"
+"PO-Revision-Date: 2016-05-13 06:04+0000\n"
+"Last-Translator: Moritz Pfeiffer <moritz@alp-phone.ch>\n"
 "Language-Team: German (http://www.transifex.com/torchbox/wagtail/language/"
 "de/)\n"
 "MIME-Version: 1.0\n"
@@ -134,6 +135,14 @@ msgstr "Häufig verwendete Schlagwörter"
 
 msgid "Uploading..."
 msgstr "Lade hoch…"
+
+msgid "Server Error"
+msgstr "Server-Fehler"
+
+msgid "Report this error to your webmaster with the following information:"
+msgstr ""
+"Melden Sie diesen Fehler Ihrem Webseitenverwalter mit der folgenden "
+"Information:"
 
 #, python-format
 msgid ""

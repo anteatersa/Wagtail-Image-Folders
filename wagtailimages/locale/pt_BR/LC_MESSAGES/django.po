@@ -7,14 +7,15 @@
 # Claudemiro Alves Feitosa Neto <dimiro1@gmail.com>, 2015
 # Gladson <gladsonbrito@gmail.com>, 2014
 # João Luiz Lorencetti <me@dirtycoder.net>, 2016
+# Luiz Boaretto <lboaretto@gmail.com>, 2016
 # Thiago Cangussu <cangussu.thg@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: Wagtail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-11 13:57+0100\n"
-"PO-Revision-Date: 2016-04-22 16:52+0000\n"
-"Last-Translator: João Luiz Lorencetti <me@dirtycoder.net>\n"
+"POT-Creation-Date: 2016-05-18 21:37+0000\n"
+"PO-Revision-Date: 2016-05-17 03:51+0000\n"
+"Last-Translator: Luiz Boaretto <lboaretto@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/torchbox/"
 "wagtail/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -131,6 +132,12 @@ msgstr "Gerar etiquetas"
 
 msgid "Uploading..."
 msgstr "Enviando..."
+
+msgid "Server Error"
+msgstr "Erro de servidor"
+
+msgid "Report this error to your webmaster with the following information:"
+msgstr "Relatar este erro ao seu webmaster com as seguintes informações:"
 
 #, python-format
 msgid ""
