@@ -11,7 +11,7 @@ A replacement of the standard wagtailimages app that adds folder support for org
 
 ## Compatibility
 
-Tested on version 1.4.5 of Wagtail
+Tested on version 1.5.2 of Wagtail
 
 ## How to install
 
