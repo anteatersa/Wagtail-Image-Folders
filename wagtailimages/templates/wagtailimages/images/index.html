@@ -43,15 +43,17 @@
             </form>
         {% endif %}
         {% endcomment %}
-        <div style="float: right">
+        <div style="float: right;">
             <div class="addbutton">
-                        <a href="{% url 'wagtailimages:add_multiple' %}?folder={{ current_folder.id }}" class="button bicolor icon icon-plus">Add an image</a>
+                        <a href="{% url 'wagtailimages:add_multiple' %}?folder={{ current_folder.id }}" class="button button-small bicolor icon icon-plus">Add image</a>
                         {% if current_folder %}
-                            <a href="/admin/images/folder/add/{{ current_folder.id }}/" class="button bicolor icon icon-plus">Add a folder</a>
-                            <a href="/admin/images/folder/{{ current_folder.id }}/" class="button icon text-replace white icon-edit">Edit Folder</a>
-                            <a href="{% url 'wagtailimages:delete_folder' current_folder.id %}"><span class="button icon text-replace no icon-bin">Delete Folder</span></a>
+                            <a href="/admin/images/folder/add/{{ current_folder.id }}/" class="button button-small bicolor icon icon-plus">Add folder</a>
+                            <a href="/admin/images/folder/{{ current_folder.id }}/" class="button button-small bicolor icon icon-edit">Edit folder</a>
+                            {#<a href="/admin/images/folder/{{ current_folder.id }}/" class="button icon text-replace white icon-edit">Edit Folder</a>#}
+                            <a href="{% url 'wagtailimages:delete_folder' current_folder.id %}" class="button button-small bicolor icon no icon-bin">Delete folder</a>
+                            {#<a href="{% url 'wagtailimages:delete_folder' current_folder.id %}"><span class="button icon text-replace no icon-bin">Delete Folder</span></a>#}
                         {% else %}
-                            <a href="/admin/images/folder/add/" class="button bicolor icon icon-plus">Add a folder</a>
+                            <a href="/admin/images/folder/add/" class="button button-small bicolor icon icon-plus">Add folder</a>
                         {% endif %}
             </div>
         </div>
@@ -66,15 +68,27 @@
                 </ul>
             </div>
         {% else %}
-            <h2>{{ current_folder.title }}</h2>
+           <h2>{{ current_folder.title }}</h2>
+            {% if current_folder.get_breadcrumbs %}
+            <div style="display: block; clear: both;">
+            <ul class="breadcrumb">
+                <li class="home"><a href="{% url 'wagtailimages:index' %}" class="icon icon-home text-replace">Home</a></li>
+                {% for fb in current_folder.get_breadcrumbs %}
+                <li><a href="{% url 'wagtailimages:index' %}?folder={{ fb.id }}">{{ fb.title }}</a></li>
+                {% endfor %}
+            </ul>
+            </div>
+            {% endif %}
             {# We are in a folder so only show folders sub to this #}
             <div id="image-results">
                 <ul class="listing folders">
+                    {% comment %}
                     {% if current_folder.get_parent %}
                         <li class="icon icon-larger icon-arrow-up-big"><a href="{% url 'wagtailimages:index' %}?folder={{ current_folder.get_parent.id }}">{{ current_folder.get_parent.title }}</a></li>
                     {% else %}
                         <li class="icon icon-larger icon-home"><a href="{% url 'wagtailimages:index' %}">Root folder</a></li>
                     {% endif %}
+                    {% endcomment %}
                     {% for folder in current_folder.get_subfolders %}
                         <li class="icon icon-larger icon-folder-inverse"><a href="?folder={{ folder.id }}">{{ folder.title }}</a></li>
                     {% endfor %}

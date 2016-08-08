@@ -10,14 +10,26 @@
             </div>
         {% else %}
             <h2>{{ current_folder.title }}</h2>
+            {% if current_folder.get_breadcrumbs %}
+            <div style="display: block; clear: both;">
+            <ul class="breadcrumb">
+                <li class="home"><a  data-folder-title="Home" data-folder="0" class="icon icon-home text-replace">Home</a></li>
+                {% for fb in current_folder.get_breadcrumbs %}
+                <li><a data-folder-title="{{ fb.title }}" data-folder="{{ fb.id }}">{{ fb.title }}</a></li>
+                {% endfor %}
+            </ul>
+            </div>
+            {% endif %}
             {# We are in a folder so only show folders sub to this #}
             <div id="folder-results">
                 <ul class="listing listing-folders folders">
+                    {% comment %}
                     {% if current_folder.get_parent %}
                         <li class="icon icon-larger icon-arrow-up-big"><a data-folder-title="{{ folder.title }}" data-folder="{{ folder.id }}" class="folder" href="{% url 'wagtailimages:index' %}?folder={{ current_folder.get_parent.id }}">{{ current_folder.get_parent.title }}</a></li>
                     {% else %}
                         <li class="icon icon-larger icon-home"><a data-folder-title="{{ folder.title }}" data-folder="{{ folder.id }}" class="folder" href="{% url 'wagtailimages:index' %}">Root folder</a></li>
                     {% endif %}
+                    {% endcomment %}
                     {% for folder in current_folder.get_subfolders %}
                         <li class="icon icon-larger icon-folder-inverse"><a data-folder-title="{{ folder.title }}" data-folder="{{ folder.id }}" class="folder" href="?folder={{ folder.id }}">{{ folder.title }}</a></li>
                     {% endfor %}
