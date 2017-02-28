@@ -10,9 +10,9 @@
         {% endblocktrans %}
         </h2>
     {% else %}
-		{% comment %}
+        {% comment %}
         <h2>{% trans "Latest images" %}</h2>
-		{% endcomment %}
+        {% endcomment %}
     {% endif %}
     
     <ul class="listing listing-images horiz images chooser">
@@ -29,9 +29,10 @@
     {% include "wagtailimages/folder/pagination_nav.html" with items=images is_ajax=1 current_folder=current_folder %}
 {% else %}
     {% if is_searching %}
-	<h2>No images found for search "{{ query_string }}"</h2>
-	{% else %}
-	<h2>No images found</h2>
-	<a href="#" id="switch-to-upload-tab" class="button button-small">Upload</a>
-	{% endif %}
+    <h2>No images found for search "{{ query_string }}"</h2>
+    {% else %}
+    <h2>No images found</h2>
+    <a href="#" id="switch-to-upload-tab" class="button button-small">Upload</a>
+    {% endif %}
+
 {% endif %}
