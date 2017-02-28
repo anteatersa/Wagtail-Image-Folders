@@ -11,11 +11,14 @@ from django.views.decorators.vary import vary_on_headers
 from wagtail.utils.pagination import paginate
 from wagtail.wagtailadmin import messages
 from wagtail.wagtailadmin.forms import SearchForm
-from wagtail.wagtailadmin.utils import PermissionPolicyChecker, permission_denied
+from wagtail.wagtailadmin.utils import (
+    PermissionPolicyChecker, permission_denied, popular_tags_for_model)
 from wagtail.wagtailcore.models import Collection, Site
+from wagtail.wagtailimages import get_image_model
 from wagtail.wagtailimages.exceptions import InvalidFilterSpecError
 from wagtail.wagtailimages.forms import URLGeneratorForm, get_image_form
-from wagtail.wagtailimages.models import get_image_model, get_folder_model, Filter
+from wagtail.wagtailimages.models import get_folder_model
+from wagtail.wagtailimages.models import Filter
 from wagtail.wagtailimages.permissions import permission_policy
 from wagtail.wagtailimages.views.serve import generate_signature
 from wagtail.wagtailsearch import index as search_index
@@ -37,7 +40,6 @@ def index(request):
     images = permission_policy.instances_user_has_any_permission_for(
         request.user, ['change', 'delete']
     ).order_by('-created_at')
-
     # Search
     query_string = None
     if 'q' in request.GET:
@@ -67,7 +69,7 @@ def index(request):
             current_folder = ImageFolder.objects.get(id=folder_id)
             images = images.filter(folder=current_folder)
         except (ValueError, ImageFolder.DoesNotExist):
-            print "error getting folder"
+            print("error getting folder")
             pass
     paginator, images = paginate(request, images)
 
@@ -82,7 +84,7 @@ def index(request):
         return render(request, 'wagtailimages/images/results.html', {
             'images': images,
             'folders': folders,
-            'current_folder' : current_folder,
+            'current_folder': current_folder,
             'query_string': query_string,
             'is_searching': bool(query_string),
         })
@@ -90,12 +92,12 @@ def index(request):
         return render(request, 'wagtailimages/images/index.html', {
             'images': images,
             'folders': folders,
-            'current_folder' : current_folder,
+            'current_folder': current_folder,
             'query_string': query_string,
             'is_searching': bool(query_string),
 
             'search_form': form,
-            'popular_tags': Image.popular_tags(),
+            'popular_tags': popular_tags_for_model(Image),
             'collections': collections,
             'current_collection': current_collection,
             'user_can_add': permission_policy.user_has_permission(request.user, 'add'),
@@ -245,18 +247,18 @@ def delete(request, image_id):
         return permission_denied(request)
 
     if image.folder:
-	parent_folder = image.folder
+        parent_folder = image.folder
     else:
-	parent_folder = False
+        parent_folder = False
 
     if request.method == 'POST':
         image.delete()
         messages.success(request, _("Image '{0}' deleted.").format(image.title))
-
         response = redirect('wagtailimages:index')
-	if parent_folder:
-	    response['Location'] += '?folder={0}'.format(parent_folder.id)
-	return response
+
+        if parent_folder:
+            response['Location'] += '?folder={0}'.format(parent_folder.id)
+        return response
 
     return render(request, "wagtailimages/images/confirm_delete.html", {
         'image': image,
