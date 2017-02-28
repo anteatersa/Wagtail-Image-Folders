@@ -7,11 +7,10 @@ A replacement of the standard wagtailimages app that adds folder support for org
  - Add folder support to Wagtail images
  - Folders can contain subfolders
  - Folders can be edited and deleted
- - Folders can only be deleted if they contain no images or other folders
 
 ## Compatibility
 
-Tested on version 1.5.2 of Wagtail
+Tested on version 1.8.x of Wagtail
 
 ## How to install
 
