@@ -111,8 +111,6 @@ class ImageFolder(models.Model):
 
     def save(self, *args, **kwargs):
 
-        self.validate_folder()
-
         # do a unidecode in the title and then
         # replace non-ascii characters in title with _ , to sidestep issues with filesystem encoding
         unicoded_title = "".join((i if ord(i) < 128 else '_') for i in unidecode(self.title))

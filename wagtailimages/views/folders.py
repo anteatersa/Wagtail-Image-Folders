@@ -21,6 +21,7 @@ def add(request, add_to_folder=False):
     if request.method == 'POST':
         # Build a form for validation
         form = ImageFolderForm(request.POST)
+        error = True
 
         if form.is_valid():
             error = False
