@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.exceptions import ValidationError
 
 from wagtail.wagtailadmin.utils import PermissionPolicyChecker
 from wagtail.wagtailimages.models import get_folder_model
@@ -22,25 +23,23 @@ def add(request, add_to_folder=False):
         form = ImageFolderForm(request.POST)
 
         if form.is_valid():
-            # TODO - Check for clashing filenames
             error = False
 
-        if parent_folder:
-            if ImageFolder.objects.filter(folder=parent_folder, title=form.cleaned_data['title'].strip()).count() > 0:
-                error = True
-                form._errors['title'] = "Folder already exists"
-        else:
-            if ImageFolder.objects.filter(folder__isnull=True, title=form.cleaned_data['title'].strip()).count() > 0:
-                error = True
-                form._errors['title'] = "Folder already exists"
-
-        if not error:
-            # Save folder
             folder = ImageFolder(
                 title=form.cleaned_data['title'].strip()
             )
             if parent_folder:
                 folder.folder = parent_folder
+
+            try:
+                # Check if the folder is present in the DB or physically present in the OS
+                folder.validate_folder()
+            except ValidationError as e:
+                error = True
+                form._errors['title'] = e.message
+
+        if not error:
+            # Save folder
             folder.save()
 
             # Success! Send back to index or image specific folder
@@ -76,9 +75,21 @@ def edit(request, folder_id):
         form = ImageFolderForm(request.POST)
 
         if form.is_valid():
-            # TODO - Check for clashing filenames
 
             folder.title = form.cleaned_data['title']
+
+            try:
+                # Check if the folder is present in the DB or physically present in the OS
+                folder.validate_folder()
+            except ValidationError as e:
+                form._errors['title'] = e.message
+                # Validation error
+                return render(request, 'wagtailimages/folder/edit.html', {
+                    'error_message': 'Error adding folder',
+                    'help_text': '',
+                    'form': form,
+                })
+
             folder.save()
 
             # Success! Send back to index or image specific folder

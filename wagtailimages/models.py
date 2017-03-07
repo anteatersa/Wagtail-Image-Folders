@@ -26,6 +26,7 @@ from django.utils.translation import ugettext_lazy as _
 from taggit.managers import TaggableManager
 from unidecode import unidecode
 from willow.image import Image as WillowImage
+from django.core.exceptions import ValidationError
 
 from wagtail.utils.deprecation import RemovedInWagtail19Warning, RemovedInWagtail110Warning
 from wagtail.wagtailadmin.utils import get_object_usage
@@ -109,9 +110,12 @@ class ImageFolder(models.Model):
         return ImageFolder.objects.filter(folder=self)
 
     def save(self, *args, **kwargs):
+
+        self.validate_folder()
+
         # do a unidecode in the title and then
         # replace non-ascii characters in title with _ , to sidestep issues with filesystem encoding
-        unicoded_title = "".join((i if ord(i) < 128 else '_') for i in unidecode(self.title.strip()))
+        unicoded_title = "".join((i if ord(i) < 128 else '_') for i in unidecode(self.title))
 
         parent_folder = self.folder
         if parent_folder:
@@ -156,10 +160,35 @@ class ImageFolder(models.Model):
         for image in images:
             image.delete()
 
-        # Physically delete the folder
-        shutil.rmtree(self.get_complete_path())
+        try:
+            # Delete the physical folder
+            shutil.rmtree(self.get_complete_path())
+        except FileNotFoundError:
+            pass
 
         super(ImageFolder, self).delete()
+
+    def validate_folder(self):
+        """Validates whether a folder can be created.
+        Performs two types of validation:
+        1. Checks if a DB entry is present.
+        2. Checks if a physical folder exists in the system."""
+
+        unicoded_title = "".join((i if ord(i) < 128 else '_') for i in unidecode(self.title))
+        parent_folder = self.folder
+
+        if parent_folder:
+            if ImageFolder.objects.filter(folder=parent_folder, title=self.title).count() > 0:
+                raise ValidationError("Folder exists in the DB!", code='db')
+            folder_path = os.path.join(settings.MEDIA_ROOT, parent_folder.path, unicoded_title)
+            if os.path.isdir(folder_path):
+                raise ValidationError("Folder exists in the OS!", code='os')
+        else:
+            if ImageFolder.objects.filter(folder__isnull=True, title=self.title).count() > 0:
+                raise ValidationError("Folder exists in the DB!", code='db')
+            folder_path = os.path.join(settings.MEDIA_ROOT, IMAGES_FOLDER_NAME, unicoded_title)
+            if os.path.isdir(folder_path):
+                raise ValidationError("Folder exists in the OS!", code='os')
 
     def get_complete_path(self):
         return os.path.join(settings.MEDIA_ROOT, self.path)
@@ -168,11 +197,6 @@ class ImageFolder(models.Model):
         return self.title
 
 
-def update_paths(folder, rename_folder=True):
-    if not rename_folder:
-        folder.save(rename=False)
-    else:
-        folder.save()
 
 
 @python_2_unicode_compatible
