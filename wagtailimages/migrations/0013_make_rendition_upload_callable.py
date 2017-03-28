@@ -8,8 +8,7 @@ import wagtail.wagtailimages.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        #('wagtailimages', '0012_copy_image_permissions_to_collections'),
-        ('wagtailimages', '0014_auto_20160525_1402'),
+        ('wagtailimages', '0012_copy_image_permissions_to_collections'),
     ]
 
     operations = [

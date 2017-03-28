@@ -9,9 +9,10 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.vary import vary_on_headers
 
 from wagtail.wagtailadmin.utils import PermissionPolicyChecker
+from wagtail.wagtailimages import get_image_model
 from wagtail.wagtailimages.fields import ALLOWED_EXTENSIONS
 from wagtail.wagtailimages.forms import get_image_form
-from wagtail.wagtailimages.models import get_image_model, get_folder_model
+from wagtail.wagtailimages.models import get_folder_model
 from wagtail.wagtailimages.permissions import permission_policy
 from wagtail.wagtailsearch.backends import get_search_backends
 
@@ -47,7 +48,7 @@ def add(request):
     current_folder = None
     folder_id = request.GET.get('folder')
     if folder_id:
-        print "folder id in url"
+        print("folder id in url")
         try:
             current_folder = ImageFolder.objects.get(id=folder_id)
         except (ValueError, ImageFolder.DoesNotExist):

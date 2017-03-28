@@ -47,13 +47,13 @@
             <div class="addbutton">
                         <a href="{% url 'wagtailimages:add_multiple' %}?folder={{ current_folder.id }}" class="button button-small bicolor icon icon-plus">Add image</a>
                         {% if current_folder %}
-                            <a href="/admin/images/folder/add/{{ current_folder.id }}/" class="button button-small bicolor icon icon-plus">Add folder</a>
-                            <a href="/admin/images/folder/{{ current_folder.id }}/" class="button button-small bicolor icon icon-edit">Edit folder</a>
+                            <a href="{% url 'wagtailimages:add_folder_to_folder' current_folder.id %}" class="button button-small bicolor icon icon-plus">Add folder</a>
+                            <a href="{% url 'wagtailimages:edit_folder' current_folder.id %}" class="button button-small bicolor icon icon-edit">Edit folder</a>
                             {#<a href="/admin/images/folder/{{ current_folder.id }}/" class="button icon text-replace white icon-edit">Edit Folder</a>#}
                             <a href="{% url 'wagtailimages:delete_folder' current_folder.id %}" class="button button-small bicolor icon no icon-bin">Delete folder</a>
                             {#<a href="{% url 'wagtailimages:delete_folder' current_folder.id %}"><span class="button icon text-replace no icon-bin">Delete Folder</span></a>#}
                         {% else %}
-                            <a href="/admin/images/folder/add/" class="button button-small bicolor icon icon-plus">Add folder</a>
+                            <a href="{% url 'wagtailimages:add_folder' %}" class="button button-small bicolor icon icon-plus">Add folder</a>
                         {% endif %}
             </div>
         </div>

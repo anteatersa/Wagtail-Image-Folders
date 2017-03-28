@@ -54,8 +54,10 @@ def get_image_form(model):
             'focal_point_height': forms.HiddenInput(attrs={'class': 'focal_point_height'}),
         })
 
+
 class ImageFolderForm(forms.ModelForm):
     title = forms.CharField(required=True)
+
 
 def get_folder_form(model):
     fields = model.admin_form_fields
